@@ -36,10 +36,12 @@ Delete -> Delete*/
 public class ContactController {
 	
 	private List<Contact> contacts = new ArrayList<Contact>();
-	
+	private ContactRepository repository;
 	
 	@Autowired
-	private ContactRepository repository;
+	public ContactController(ContactRepository contactrep){
+		this.repository=contactrep;
+	}
 	
 	//crear ---> post
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
@@ -86,7 +88,7 @@ public class ContactController {
 		}
 		else{
 			
-			List<Contact> list = repository.findByLastname(lname);
+			List<Contact> list = repository.findByLastnameIgnoreCase(lname);
 			if(list != null){
 				System.out.println("list esta llena");
 				if(list.size() > 0){
@@ -104,6 +106,23 @@ public class ContactController {
 		
 	}
 
+	
+	@RequestMapping(value="/byEmail/{emailadd}", method=RequestMethod.GET)
+	public String getContactByEmailAddress(@PathVariable String emailadd, ModelMap model){
+		
+		if(!"".equals(emailadd)){
+			System.out.println("get Contact by Email address " + emailadd);
+			Contact contact = repository.findByEmail(emailadd);
+			if(contact != null){
+				
+				System.out.println(contact.toString());
+			}
+			else
+			System.out.println("No se encontro Contact con email: " + emailadd);
+		}
+		return "redirect:/contact";
+	}
+	
 	/*@RequestMapping(value="/delete", method=RequestMethod.DELETE)
 	public String deleteContact(@RequestParam String id) {
 
@@ -122,4 +141,20 @@ public class ContactController {
 		return "redirect:/contact";
 	}
 	
+	@RequestMapping(value="/NombreEndLike/{nombre}", method=RequestMethod.GET)
+	public String getPrimerNombreEndLike(@PathVariable String nombre, ModelMap model){//buscarPorPrimerNombreEndLike
+		System.out.println("getPrimerNombreEndLike:  "+ nombre );
+		if(!"".equals(nombre)){
+			this.contacts = repository.buscarPorPrimerNombreEndLike(nombre);
+			if(contacts != null){
+				
+				model.addAttribute("contact", new Contact());//inicializamos el modelo para el form
+				model.addAttribute("contacts", contacts); //inicializamos la lista de contacts
+				return "contact";
+			}
+			else
+			System.out.println("No se encontro Contact con nombre like end: " + nombre);
+		}
+		return "redirect:/contact";
+	}
 }

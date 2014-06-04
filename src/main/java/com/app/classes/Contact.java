@@ -13,13 +13,18 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.FetchType;
 import javax.persistence.NamedQuery;
+import javax.persistence.NamedQueries;
 
 @Entity
 @Table(name = "contact")
-@NamedQuery(name=Contact.FIND_ALL, query="SELECT p FROM Contact p") //estas consultas estaticas son eficientes
+@NamedQueries({
+@NamedQuery(name=Contact.FIND_ALL, query="SELECT p FROM Contact p"), //estas consultas estaticas son eficientes
+@NamedQuery(name=Contact.FIND_ByEmail, query="SELECT p FROM Contact p where p.email = ?1")
+})
 public class Contact {
 	
 	public static final String FIND_ALL = "Contact.findAll"; 
+	public static final String FIND_ByEmail="Contact.findByEmail";
 
 	@Id
 	@Column(name = "ID")
@@ -100,8 +105,7 @@ public class Contact {
 	}
 	*/
 	public String toString() {
-		return "Contact [firstname=" + firstname + ", lastname=" + lastname + ", Category= " 
-				+ "]";
+		return "Contact [id=" + id + ", firstname=" + firstname + ", lastname=" + lastname + "]";
 	}
 
 }
